@@ -1,4 +1,9 @@
 # ticket_price_gui.py
+'''
+---------------------------------------
+อนิวัตติ์ สงัดรัมย์ 1660704881 เลขที่ 28
+---------------------------------------
+'''
 
 import tkinter as tk
 from tkinter import messagebox
@@ -44,8 +49,8 @@ def confirm_ticket(price, root, staff_id, route_number, vehicle_id, route_id, ro
                 
                 messagebox.showinfo("Success", f"Ticket {ticket_no} confirmed and saved to DB!")
                 
-                # 3. ส่งข้อมูลทั้งหมดไปหน้า Ticket Print
-                ticket_print.open_ticket_print_screen(root, staff_id, route_number, vehicle_id, price, route_description)
+                # 3. ส่งข้อมูลทั้งหมดไปหน้า Ticket Print (เพิ่ม route_id เข้าไป)
+                ticket_print.open_ticket_print_screen(root, staff_id, route_number, vehicle_id, price, route_description, route_id)
                 return
                 
             except Exception as e:
@@ -91,6 +96,7 @@ def open_select_price_screen(prev_root, staff_id, route_number, vehicle_id, rout
 
     # Create Price Buttons
     for i, p in enumerate(prices):
+        # ส่ง route_id เข้าไปใน confirm_ticket
         cmd = lambda price=p: confirm_ticket(price, root, staff_id, route_number, vehicle_id, route_id, route_description)
         
         btn = tk.Button(frame, text=str(p), width=8, height=2,

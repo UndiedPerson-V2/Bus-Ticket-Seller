@@ -5,6 +5,7 @@ from tkinter import messagebox
 from db_connector import get_logged_in_user_info
 from datetime import datetime
 import Bus_Select_gui 
+import ticket_price_gui # Import เพื่อให้เรียกกลับไปหน้า Price ได้
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 import os 
@@ -62,7 +63,7 @@ def create_ticket_pdf(data):
 # Tkinter Screen
 # ====================================================================
 
-def open_ticket_print_screen(prev_root, staff_id, route_number, vehicle_id, price, route_description): 
+def open_ticket_print_screen(prev_root, staff_id, route_number, vehicle_id, price, route_description, route_id): 
     """Creates the Ticket Print screen and links it to the PDF generation function."""
     if prev_root:
         prev_root.destroy()
@@ -100,22 +101,38 @@ def open_ticket_print_screen(prev_root, staff_id, route_number, vehicle_id, pric
         "price": "Price"
     }
     
+    # --- New Navigation Function ---
+    def go_back_to_select_price():
+        """
+        นำกลับไปหน้า Select Price โดยส่งค่า Vehicle ID, Route ID, และ Route Description ที่ยืนยันแล้วกลับไปด้วย
+        """
+        print_root.destroy()
+        ticket_price_gui.open_select_price_screen(
+            None, 
+            staff_id, 
+            route_number, 
+            vehicle_id, 
+            route_id, 
+            route_description
+        )
+
     def print_action():
-        """Performs PDF printing and returns to the Select Bus screen."""
+        """Performs PDF printing and returns to the Select Price screen."""
         pdf_path = create_ticket_pdf(ticket_data)
         
         if pdf_path:
             messagebox.showinfo("Print Success", 
                                 f"Ticket PDF created successfully!\nFile saved at:\n{pdf_path}")
-            Bus_Select_gui.open_select_bus_screen(print_root, staff_id)
+            # กลับไปหน้า Select Price หลังพิมพ์เสร็จ
+            go_back_to_select_price()
         else:
             messagebox.showwarning("Print Failed", "Could not save the ticket as PDF.")
 
 
     def go_back_to_dashboard():
-        """Cancels and returns to the Select Bus screen."""
-        if messagebox.askyesno("Cancel Transaction", "Do you want to cancel and return to Select Bus?"):
-             Bus_Select_gui.open_select_bus_screen(print_root, staff_id)
+        """Cancels and returns to the Select Price screen."""
+        if messagebox.askyesno("Cancel Transaction", "Do you want to cancel and return to Select Price?"):
+             go_back_to_select_price()
 
 
     # --- UI Elements ---
@@ -148,8 +165,8 @@ def open_ticket_print_screen(prev_root, staff_id, route_number, vehicle_id, pric
     print_btn.pack(pady=40)
 
     # Back Button
-    back_btn = tk.Button(print_root, text="Back/Cancel", width=20,
-                        command=go_back_to_dashboard,
+    back_btn = tk.Button(print_root, text="Back/Cancel (Select Price)", width=25,
+                        command=go_back_to_dashboard, 
                         bg="#f8d7da", fg="#721c24",
                         relief="flat", bd=0)
     back_btn.pack(pady=10)
